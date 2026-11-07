@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ZainVille - Pyara Island 🌴</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:#000;color:#fff;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+#lobby{position:fixed;inset:0;background:linear-gradient(180deg,#00bfff,#001a2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;text-align:center;padding:20px;overflow-y:auto}
+#lobby h1{font-size:42px;text-shadow:0 0 20px #fff} #lobby h1 span{color:#ffcc00}
+#lobby p{color:#e0f7ff;margin:8px 0}
+#nameInput{padding:13px;border-radius:25px;border:3px solid #ffcc00;background:rgba(0,0,0,.5);color:#fff;width:260px;text-align:center;font-size:16px;outline:none;margin:10px 0}
+#avatars{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap;justify-content:center}
+.av{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid transparent;display:flex;align-items:center;justify-content:center;font-size:32px}
+.av.sel{border-color:#ffcc00;box-shadow:0 0 15px #ffcc00;background:rgba(255,255,255,.4)}
+#clothes{display:flex;gap:8px;margin:8px 0;flex-wrap:wrap;justify-content:center}
+.cloth{padding:8px 12px;border-radius:20px;background:rgba(0,0,0,.4);border:2px solid #fff;font-size:12px}
+.cloth.sel{background:#ffcc00;color:#000;border-color:#ffcc00}
+#enterBtn{padding:15px 50px;border:none;border-radius:30px;background:#ffcc00;color:#000;font-size:20px;font-weight:bold;box-shadow:0 0 25px #ffcc00;margin-top:12px}
+#top{padding:7px 10px;background:#061a3a;display:flex;justify-content:space-between;align-items:center;font-weight:bold;font-size:13px;border-bottom:2px solid #00bfff}
+#top span{font-size:13px}
+#wrap{flex:1;position:relative;overflow:hidden;background:#7ec850}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#bubble{position:absolute;left:50%;top:32%;transform:translate(-50%,-50%);background:#fff;color:#000;padding:8px 14px;border-radius:15px;font-weight:bold;display:none;max-width:240px;text-align:center;z-index:10}
+#npcTalk{position:fixed;bottom:130px;left:10px;right:10px;background:rgba(0,0,0,.85);padding:12px;border-radius:15px;border:2px solid #00bfff;display:none;z-index:20}
+#npcTalk b{color:#00e5ff}
+#bottom{padding:8px 10px;background:#061a3a;display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+#joy{width:108px;height:108px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid #fff;position:relative;flex-shrink:0}
+#knob{width:46px;height:46px;border-radius:50%;background:#ffcc00;position:absolute;left:31px;top:31px}
+#acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:220px}
+.abtn{padding:9px 11px;border-radius:20px;background:#222;border:1px solid #fff;font-size:13px;font-weight:bold}
+.abtn.hot{background:#ffcc00;color:#000}
+#chatBox{position:fixed;bottom:135px;left:0;right:0;display:flex;gap:6px;padding:0 10px;z-index:15}
+#chatBox input{flex:1;padding:11px;border-radius:20px;border:2px solid #00bfff;background:rgba(0,0,0,.7);color:#fff;outline:none}
+#chatBox button{padding:11px 16px;border-radius:20px;border:none;background:#00bfff;font-weight:bold}
+#friends{position:fixed;top:50px;right:8px;background:rgba(0,0,0,.6);padding:8px 10px;border-radius:12px;font-size:12px;z-index:10;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div id="lobby">
+<div style="font-size:60px">🌴🏖️</div>
+<h1>Zain<span>Ville</span></h1>
+<p>🌸 Pyara Island • Apne Dost • Apni Duniya 🌸</p>
+<p style="font-size:13px">Lobby me apna naam, avatar aur dress choose karo,<br>phir Island me ghumo, doston se milo, dance karo!</p>
+<input id="nameInput" placeholder="Apna pyara naam likho..." maxlength="12" value="Zain">
+<div style="font-weight:bold;margin-top:8px">Apna Avatar Chuno:</div>
+<div id="avatars">
+<div class="av sel" onclick="pickAv(this,'😎')">😎</div>
+<div class="av" onclick="pickAv(this,'😀')">😀</div>
+<div class="av" onclick="pickAv(this,'😺')">😺</div>
+<div class="av" onclick="pickAv(this,'🦁')">🦁</div>
+<div class="av" onclick="pickAv(this,'👽')">👽</div>
+<div class="av" onclick="pickAv(this,'🦸')">🦸</div>
+</div>
+<div style="font-weight:bold">Dress Chuno:</div>
+<div id="clothes">
+<div class="cloth sel" onclick="pickCloth(this,'#ffcc00')">💛 Yellow</div>
+<div class="cloth" onclick="pickCloth(this,'#00bfff')">💙 Blue</div>
+<div class="cloth" onclick="pickCloth(this,'#ff66aa')">💗 Pink</div>
+<div class="cloth" onclick="pickCloth(this,'#00ff88')">💚 Green</div>
+<div class="cloth" onclick="pickCloth(this,'#aa66ff')">💜 Purple</div>
+</div>
+<button id="enterBtn" onclick="enterIsland()">🏝️ ISLAND ME JAO</button>
+<p style="font-size:11px;color:#cfeeff">Tip: Island me NPC se baat karo, unke paas mission hai!</p>
+</div>
+
+<div id="top"><div>🌴 <span id="myName">Zain</span> <span id="myAv">😎</span></div><div>⭐ Level <span id="level">1</span> • 🪙 <span id="coins">0</span></div><div>👥 <span id="online">8</span> Online</div></div>
+
+<div id="wrap">
+<canvas id="game"></canvas>
+<div id="bubble"></div>
+<div id="friends">👥 Island Friends<br>🟢 Ayesha • Dance Area<br>🟢 Ali • Beach<br>🟢 Sara • Cafe<br>🟢 Bilal • Shop</div>
+<div id="npcTalk"></div>
+</div>
+
+<div id="chatBox"><input id="chatInp" placeholder="Island me kuch bolo..."><button onclick="sayChat()">Send 💬</button></div>
+
+<div id="bottom">
+<div id="joy"><div id="knob"></div></div>
+<div id="acts">
+<button class="abtn hot" onclick="doEmote('💃 Dance')">💃 Dance</button>
+<button class="abtn" onclick="doEmote('👋 Hi!')">👋 Hi</button>
+<button class="abtn" onclick="doEmote('😂 Haha!')">😂 Laugh</button>
+<button class="abtn" onclick="doEmote('❤️ Love')">❤️ Love</button>
+<button class="abtn" onclick="doEmote('🦘 Jump')">🦘 Jump</button>
+<button class="abtn" onclick="talkNPC()">💬 Baat Karo</button>
+</div>
+</div>
+
+<script>
+let canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=0,H=0,myName="Zain",myAv="😎",myColor="#ffcc00",coins=0,level=1;
+let player={x:1000,y:1000,r:22,angle:0,emote:"",emoteTime:0,jump:0};
+let joyX=0,joyY=0,chatMsg="",chatTime=0;
+let npcs=[
+{x:700,y:600,av:"👩",name:"Ayesha",msg:"Hi! ZainVille me welcome! Dance Area me jao, wahan maza hai! 💃",zone:"Dance Area"},
+{x:1400,y:1300,av:"🧑",name:"Ali",msg:"Arey dost! Beach pe aao, wahan coins milenge! 🏖️ Coins jama karo!",zone:"Beach"},
+{x:500,y:1400,av:"👧",name:"Sara",msg:"Cafe me meri chai piyo! Aur mujhe apna naam batao, main yaad rakhungi ☕",zone:"Cafe"},
+{x:1500,y:600,av:"👦",name:"Bilal",msg:"Shop se naya dress lo! Tumhara dress boht pyara hai! 🛍️",zone:"Shop"},
+{x:1000,y:300,av:"🧓",name:"Dada Jee",msg:"Beta ZainVille me sab dost hain. Kisi se larna nahi, sab se pyar se milna! ❤️",zone:"Park"},
+];
+let coinsOnMap=[]; for(let i=0;i<15;i++){coinsOnMap.push({x:150+Math.random()*1700,y:150+Math.random()*1700,taken:false});}
+let MAP=2000;
+function pickAv(el,a){document.querySelectorAll('.av').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');myAv=a;}
+function pickCloth(el,c){document.querySelectorAll('.cloth').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');myColor=c;}
+function resize(){W=canvas.parentElement.clientWidth;H=canvas.parentElement.clientHeight;canvas.width=W;canvas.height=H;}
+window.addEventListener('resize',resize);
+function enterIsland(){let v=document.getElementById('nameInput').value.trim();if(v)myName=v;document.getElementById('myName').innerText=myName;document.getElementById('myAv').innerText=myAv;document.getElementById('lobby').style.display='none';resize();showBubble("Hi! Main "+myName+" hun! ZainVille me aa gaya! 🌴");setTimeout(()=>{document.getElementById('npcTalk').style.display='block';document.getElementById('npcTalk').innerHTML="<b>🌴 ZainVille Guide:</b> Joystick se ghumo! NPC ke paas jao aur <b>Baat Karo</b> dabao. Coins uthao, Level badhao!";setTimeout(()=>document.getElementById('npcTalk').style.display='none',5000);},1000);loop();}
+function showBubble(t){let b=document.getElementById('bubble');b.innerText=t;b.style.display='block';setTimeout(()=>b.style.display='none',3000);}
+function doEmote(e){player.emote=e;player.emoteTime=120;if(e.includes('Dance')){player.jump=12;showBubble(myName+" dance kar raha hai! 💃");addCoins(5);}if(e.includes('Hi'))showBubble("👋 Hi sab ko! Main "+myName+" hun!");if(e.includes('Haha'))showBubble("😂😂 Hahaha maza aa gaya!");if(e.includes('Love'))showBubble("❤️ Sab ko pyar! ZainVille best hai!");if(e.includes('Jump'))player.jump=20;}
+function addCoins(n){coins+=n;document.getElementById('coins').innerText=coins;if(coins>0&&coins%30==0){level++;document.getElementById('level').innerText=level;showBubble("🎉 LEVEL UP! Ab tum Level "+level+" ho!");}}
+function sayChat(){let inp=document.getElementById('chatInp');let v=inp.value.trim();if(!v)return;chatMsg=v;chatTime=200;showBubble(myName+": "+v);inp.value='';addCoins(2);}
+function talkNPC(){let near=null,dist=999;npcs.forEach(n=>{let d=Math.hypot(n.x-player.x,n.y-player.y);if(d<dist){dist=d;near=n;}});if(near&&dist<110){let box=document.getElementById('npcTalk');box.style.display='block';box.innerHTML="<b>"+near.av+" "+near.name+" ("+near.zone+"):</b><br>"+near.msg+"<br><button onclick=\"document.getElementById('npcTalk').style.display='none'\" style=\"margin-top:6px;padding:6px 12px;border-radius:10px;border:none;background:#00bfff;font-weight:bold\">OK 💙</button>";addCoins(10);showBubble("🪙 +10 Coins mile!");}else{showBubble("Kisi dost ke paas jao, phir Baat Karo dabao! 👥");}}
+let joy=document.getElementById('joy'),knob=document.getElementById('knob');
+joy.addEventListener('touchstart',e=>{moveJoy(e);},{passive:false});
+joy.addEventListener('touchmove',e=>{e.preventDefault();moveJoy(e);},{passive:false});
+joy.addEventListener('touchend',()=>{joyX=0;joyY=0;knob.style.left='31px';knob.style.top='31px';});
+function moveJoy(e){let r=joy.getBoundingClientRect(),t=e.touches[0],dx=t.clientX-(r.left+r.width/2),dy=t.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy)||1,max=38;if(d>max){dx=dx/d*max;dy=dy/d*max}knob.style.left=(31+dx)+'px';knob.style.top=(31+dy)+'px';joyX=dx/max;joyY=dy/max;}
+canvas.addEventListener('touchstart',e=>{let r=canvas.getBoundingClientRect(),t=e.touches[0];player.angle=Math.atan2((t.clientY-r.top)-H/2,(t.clientX-r.left)-W/2);});
+document.getElementById('chatInp').addEventListener('keypress',e=>{if(e.key=='Enter')sayChat();});
+function update(){
+if(document.getElementById('lobby').style.display!='none')return;
+player.x+=joyX*4.5;player.y+=joyY*4.5;player.x=Math.max(30,Math.min(MAP-30,player.x));player.y=Math.max(30,Math.min(MAP-30,player.y));
+if(player.emoteTime>0)player.emoteTime--;if(player.jump>0)player.jump--;if(chatTime>0)chatTime--;
+coinsOnMap.forEach(c=>{if(!c.taken&&Math.hypot(c.x-player.x,c.y-player.y)<30){c.taken=true;addCoins(5);showBubble("🪙 +5 Coins! Total: "+coins);}});
+}
+function draw(){
+if(document.getElementById('lobby').style.display!='none')return;
+ctx.clearRect(0,0,W,H);let camX=player.x-W/2,camY=player.y-H/2;
+ctx.fillStyle='#7ec850';ctx.fillRect(0,0,W,H);
+for(let gx=Math.floor(camX/100)*100;gx<camX+W+100;gx+=100){for(let gy=Math.floor(camY/100)*100;gy<camY+H+100;gy+=100){ctx.fillStyle=(gx/100+gy/100)%2==0?'#7ec850':'#76c047';ctx.fillRect(gx-camX,gy-camY,98,98);}}
+function zone(x,y,w,h,col,txt,emoji){let sx=x-camX,sy=y-camY;if(sx<-200||sx>W+200||sy<-100||sy>H+100)return;ctx.fillStyle=col;ctx.fillRect(sx,sy,w,h);ctx.fillStyle='#000';ctx.font='bold 16px Arial';ctx.textAlign='center';ctx.fillText(emoji+" "+txt,sx+w/2,sy+25);}
+zone(550,450,300,200,'#ff9ff3','DANCE AREA','💃');zone(1250,1150,350,250,'#ffeaa7','BEACH','🏖️');zone(350,1250,300,200,'#fab1a0','CAFE','☕');zone(1350,450,300,200,'#a29bfe','SHOP','🛍️');zone(850,150,300,200,'#55efc4','PARK','🌳');
+ctx.fillStyle='#00bfff';ctx.fillRect(0,0,W,20);ctx.fillRect(0,H-20,W,20);
+coinsOnMap.forEach(c=>{if(c.taken)return;let sx=c.x-camX,sy=c.y-camY;if(sx<-20||sx>W+20||sy<-20||sy>H+20)return;ctx.font='22px Arial';ctx.fillText('🪙',sx,sy);});
+npcs.forEach(n=>{let sx=n.x-camX,sy=n.y-camY;if(sx<-40||sx>W+40||sy<-40||sy>H+40)return;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,22,0,Math.PI*2);ctx.fill();ctx.font='28px Arial';ctx.textAlign='center';ctx.fillText(n.av,sx,sy+10);ctx.fillStyle='#000';ctx.font='bold 11px Arial';ctx.fillText(n.name,sx,sy+38);if(Math.hypot(n.x-player.x,n.y-player.y)<110){ctx.fillStyle='#ffcc00';ctx.font='bold 12px Arial';ctx.fillText('💬 Baat Karo!',sx,sy-35);}});
+let px=W/2,py=H/2-player.jump;
+ctx.fillStyle=myColor;ctx.beginPath();ctx.arc(px,py,player.r,0,Math.PI*2);ctx.fill();ctx.font='30px Arial';ctx.fillText(myAv,px,py+10);ctx.fillStyle='#000';ctx.font='bold 12px Arial';ctx.fillText(myName,px,py+38);
+if(player.emoteTime>0){ctx.font='bold 14px Arial';ctx.fillStyle='#fff';ctx.fillText(player.emote,px,py-38);}
+if(chatTime>0){ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.fillText("💬 "+chatMsg,px,py-55);}
+}
+function loop(){update();draw();requestAnimationFrame(loop);}
+</script>
+</body>
+</html>
